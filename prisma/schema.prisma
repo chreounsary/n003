@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String @unique
+  name  String?
+  posts Post[] // relation field (defined only at the Prisma ORM level)
+  projects Project[] // opposite relation field for Project model
+  userInfo UserInfo? // opposite relation field for UserInfo model
+}
+
+model Post {
+  id       Int    @id @default(autoincrement())
+  title    String
+  author   User   @relation(fields: [authorId], references: [id]) // relation field (uses the relation scalar field `authorId` below)
+  authorId Int // relation scalar field (used in the `@relation` attribute above)
+}
+model Project {
+  id     Int    @id @default(autoincrement())
+  name   String
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  tasks  Task[] // opposite relation field for Task model
+}// relation field (uses the relation scalar field `userId` below)
+
+model Task {
+  id        Int      @id @default(autoincrement())
+  title     String
+  status    TaskStatus
+  project   Project  @relation(fields: [projectId], references: [id])
+  projectId Int
+}// relation field (uses the relation scalar field `projectId` below)
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+model UserInfo {
+  id     Int     @id @default(autoincrement())
+  userId Int @unique
+  user   User    @relation(fields: [userId], references: [id])
+  bio    String?
+  age    Int?
+}// relation field (uses the relation scalar field `userId` below)
+
+
+
+model Employees {
+  id       Int    @id @default(autoincrement())
+  name    String
+}
