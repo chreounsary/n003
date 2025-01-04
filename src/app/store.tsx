@@ -2,13 +2,15 @@ import { configureStore } from '@reduxjs/toolkit'
 import counterReducer from './features/counter/counterSlice'
 import employeesReducer from './reduxToolkit/slice'
 import  fetchListData  from './reduxToolkit/listSlice'
+import  setFlashMessage from './reduxToolkit/messageSlice'
 
 
 export const store = configureStore({
     reducer: {
         counter: counterReducer,
         employees: employeesReducer,
-        list: fetchListData
+        list: fetchListData,
+        message: setFlashMessage,
     },
 })
 

@@ -1,19 +1,29 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// Async thunk for fetching data employees
-export const fetchListData = createAsyncThunk(
-    'list/fetchListData',
-    async () => {
-        try {
-            const response = await fetch('/api/employees');
-            const data = await response.json();
-         
-            return data;
-        } catch (error) {
-            return error;
-        }
+// Async thunk for fetching data employees and filter by name
+export const fetchListData = createAsyncThunk('employees/fetchEmployees', async (name) => {
+    try {
+        const response = await fetch(`/api/employees?name=${name}`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return error;
     }
-);
+});
+
+// export const fetchListData = createAsyncThunk(
+//     'list/fetchListData',
+//     async () => {
+//         try {
+//             const response = await fetch('/api/employees');
+//             const data = await response.json();
+         
+//             return data;
+//         } catch (error) {
+//             return error;
+//         }
+//     }
+// );
 
 const listSlice = createSlice({
     name: 'list',

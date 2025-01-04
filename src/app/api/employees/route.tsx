@@ -20,11 +20,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "User not created" }, { status: 400 });
 }
 
-/**
- * @description Get all users
- * @returns {NextResponse} JSON response containing array of user objects
- */
+// Fetching data employees and filter by name
+
 export async function GET(req: NextRequest) {
-    const employees = await prisma.employees.findMany();
-    return NextResponse.json(employees);
+    const { searchParams } = new URL(req.url);
+    const name = searchParams.get('name');
+    console.log(name);
+    if (name === undefined) {
+        const employees = await prisma.employees.findMany();
+        return NextResponse.json(employees);
+    }else {
+        const employees = await prisma.employees.findMany({
+            where: {
+                name: {
+                    contains: name ? name.toString() : ""
+                }
+            }
+        });
+        return NextResponse.json(employees);
+    }
 }
