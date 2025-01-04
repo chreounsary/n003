@@ -36,20 +36,9 @@ export const insertEmployee = createAsyncThunk(
     }
 );
 
-// fetch employee
-export const fetchEmployees = createAsyncThunk(
-    'employees/fetchEmployees',
-    async (_: any, { rejectWithValue }: { rejectWithValue: (value: any) => void }) => {
-        const response = await fetch('/api/employees');
-        const data = await response.json();
-        return data;
-
-    }
-);
-
 // update employee
-export const updateEmployee = createAsyncThunk(
-    'data/updateEmployee',
+export const updateEmployees = createAsyncThunk(
+    'data/updateEmployees',
     async (payload: Employee) => {
         try {
             const response = await fetch(`/api/employees/${payload.id}`, {
@@ -62,6 +51,28 @@ export const updateEmployee = createAsyncThunk(
 
             if (!response.ok) {
                 throw new Error('Failed to update data');
+            }
+
+            const data = await response.json();
+            console.log(data);
+            return data;
+        } catch (error : any) {
+            throw new Error(error.message);
+        }
+    }
+);
+
+// delete employee
+export const deleteEmployees = createAsyncThunk(
+    'data/deleteEmployee',
+    async (id: string) => {
+        try {
+            const response = await fetch(`/api/employees/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete data');
             }
 
             const data = await response.json();
@@ -89,21 +100,30 @@ const employeesSlice = createSlice({
         builder.addCase(insertEmployee.rejected, (state: any, action: any) => {
             console.error('Error:', action.error);
         });
-        
-        builder.addCase(fetchEmployees.pending, (state: any, action: any) => {
-                state.status = 'loading';
-        })
-        builder.addCase(fetchEmployees.fulfilled, (state: any, action: any) => {
-            state.status = 'succeeded';
-            state.data = action.payload;
-        })
-        builder.addCase(fetchEmployees.rejected, (state: any, action: any) => {
-            state.status = 'failed';
-            state.error = action.payload;
+        builder.addCase(updateEmployees.pending, (state: any, action: any) => {
+            state.status = 'loading';
+            state.error = null;
+        });
+        builder.addCase(updateEmployees.fulfilled, (state: any, action: any) => {
+            const index = state.data.findIndex((item: any) => item.id === action.payload.id);
+            if (index !== -1) {
+                state.data[index] = action.payload;
+            }
+        });
+        builder.addCase(updateEmployees.rejected, (state: any, action: any) => {
+            console.error('Error:', action.error);
+        });
+        builder.addCase(deleteEmployees.pending, (state: any, action: any) => {
+            state.status = 'loading';
+            state.error = null;
+        });
+        builder.addCase(deleteEmployees.fulfilled, (state: any, action: any) => {
+            state.data = state.data.filter((item: any) => item.id !== action.payload.id);
+        });
+        builder.addCase(deleteEmployees.rejected, (state: any, action: any) => {
+            console.error('Error:', action.error);
         });
     },
 });
-
-// export const { employees } = employeesSlice.actions;
 
 export default employeesSlice.reducer;
