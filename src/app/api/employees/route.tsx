@@ -3,20 +3,18 @@ import { PrismaClient } from "@prisma/client";
 import { NextResponse, NextRequest } from "next/server";
 const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
-
     const body = await req.json();
-    const { name, email } = body;
-    const user = await prisma.user.create({
+    const { name } = body;
+    const employees = await prisma.employees.create({
         data: {
-            name,
-            email
+            name
         }
     });
 
-    if (user) {
+    if (employees) {
         return NextResponse.json({
-            message: "User created successfully",
-            data: user
+            message: "employees created successfully",
+            data: employees
         });
     }
     return NextResponse.json({ error: "User not created" }, { status: 400 });
@@ -27,6 +25,6 @@ export async function POST(req: NextRequest) {
  * @returns {NextResponse} JSON response containing array of user objects
  */
 export async function GET(req: NextRequest) {
-    const users = await prisma.user.findMany();
-    return NextResponse.json(users);
+    const employees = await prisma.employees.findMany();
+    return NextResponse.json(employees);
 }

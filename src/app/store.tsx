@@ -1,9 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
 import counterReducer from './features/counter/counterSlice'
+import employeesReducer from './reduxToolkit/slice'
+import  fetchListData  from './reduxToolkit/listSlice'
+
 
 export const store = configureStore({
     reducer: {
         counter: counterReducer,
+        employees: employeesReducer,
+        list: fetchListData
     },
 })
 
