@@ -95,7 +95,6 @@ const employeesSlice = createSlice({
         });
         builder.addCase(insertEmployee.fulfilled, (state: any, action: any) => {
             state.data.push(action.payload);
-
         });
         builder.addCase(insertEmployee.rejected, (state: any, action: any) => {
             console.error('Error:', action.error);

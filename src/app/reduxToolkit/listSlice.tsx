@@ -3,14 +3,14 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // Async thunk for fetching data employees
 export const fetchListData = createAsyncThunk(
     'list/fetchListData',
-    async (_, { rejectWithValue }) => {
+    async () => {
         try {
             const response = await fetch('/api/employees');
             const data = await response.json();
          
             return data;
         } catch (error) {
-            return rejectWithValue((error as Error).message);
+            return error;
         }
     }
 );
