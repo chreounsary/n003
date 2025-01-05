@@ -8,10 +8,8 @@ const prisma = new PrismaClient();
 
 
 export async function POST(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const userId = 1;
     const body = await req.json();
-    console.log(body);
+    const userId = req.url.split("/").pop();
     const { name, description } = body;
 
     const project = await prisma.project.create({
