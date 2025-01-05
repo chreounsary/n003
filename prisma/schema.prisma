@@ -11,24 +11,33 @@ model User {
   id    Int     @id @default(autoincrement())
   email String @unique
   name  String?
-  posts Post[] // relation field (defined only at the Prisma ORM level)
   projects Project[] // opposite relation field for Project model
   userInfo UserInfo? // opposite relation field for UserInfo model
+  tasks    Task[] // opposite relation field for Task model
+  developer DeveloperHandler? // opposite relation field for Developer model
 }
 
-model Post {
-  id       Int    @id @default(autoincrement())
-  title    String
-  author   User   @relation(fields: [authorId], references: [id]) // relation field (uses the relation scalar field `authorId` below)
-  authorId Int // relation scalar field (used in the `@relation` attribute above)
-}
 model Project {
-  id     Int    @id @default(autoincrement())
-  name   String
-  userId Int
-  user   User   @relation(fields: [userId], references: [id])
-  tasks  Task[] // opposite relation field for Task model
+  id         Int        @id @default(autoincrement())
+  name       String
+  userId     Int
+  user       User       @relation(fields: [userId], references: [id])
+  tasks      Task[]     // opposite relation field for Task model
+  developers DeveloperHandler[] // opposite relation field for Developer model
+  projectInfo ProjectInfo? // opposite relation field for ProjectInfo model
 }// relation field (uses the relation scalar field `userId` below)
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
 
 model Task {
   id        Int      @id @default(autoincrement())
@@ -36,12 +45,28 @@ model Task {
   status    TaskStatus
   project   Project  @relation(fields: [projectId], references: [id])
   projectId Int
-}// relation field (uses the relation scalar field `projectId` below)
+  priority  TaskPriority
+  user      User?     @relation(fields: [userId], references: [id])
+  userId Int // relation scalar field (used in the `@relation` attribute above)
+  developer DeveloperHandler? @relation(fields: [developerId], references: [id])
+  developerId Int?
+}
 
-enum TaskStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
+// create a new model for developers handling tasks
+model DeveloperHandler {
+  id         Int      @id @default(autoincrement())
+  userId    Int     @unique
+  user       User    @relation(fields: [userId], references: [id])
+  tasks     Task[]
+  projects  Project[]
+}
+// create a new model for managing project information
+model ProjectInfo {
+  id         Int      @id @default(autoincrement())
+  projectId Int     @unique 
+  project    Project  @relation(fields: [projectId], references: [id])
+  description String
+  startDate  DateTime
 }
 
 model UserInfo {
