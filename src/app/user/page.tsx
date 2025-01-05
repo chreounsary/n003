@@ -1,9 +1,11 @@
 "use client";
 import { useRouter, redirect } from 'next/navigation';
 import { useState, useEffect } from "react";
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import Link from 'next/link';
+import Image from "next/image";
 
 export default function Users() {
-    const router = useRouter();
     interface User {
         id: number;
         name: string;
@@ -14,7 +16,7 @@ export default function Users() {
     const [editingUserId, setEditingUserId] = useState<number | null>(null);
     const [name, setName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
-
+    
     const fetchUsers = async () => {
         const response = await fetch("/api/users");  
         const data = await response.json();
@@ -81,47 +83,101 @@ export default function Users() {
 
     return (
         <div>
-            <h1>User List</h1>
+        <Breadcrumb pageName="User List" />
+            <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
+                <div className="flex flex-col gap-9">
+                    {/* <!-- Sign Up Form --> */}
+                    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+                    <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
+                        <h3 className="font-medium text-black dark:text-white">
+                        Add User
+                        </h3>
+                    </div>
+                    <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+                        <div className="p-6.5">
+                        <div className="mb-4.5">
+                            <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                            Name
+                            </label>
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="Enter user name"
+                                required
+                                className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                            />
+                        </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
-                <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter user name"
-                    required
-                />
-            <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter user email"
-                required
-            />
-                <button type="submit">{editingUserId !== null ? "Update" : "Add"} User</button>
-            </form>
+                        <div className="mb-4.5">
+                            <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                            Email
+                            </label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter user email"
+                                required
+                                className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                            />
+                        </div>
+                        <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90" type="submit">{editingUserId !== null ? "Update" : "Add"} User</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+            <br />
+            
+            <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+                <div className="flex flex-col">
+                    <div className="grid grid-cols-3 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
+                    <div className="p-2.5 xl:p-5">
+                        <h5 className="text-sm font-medium uppercase xsm:text-base">
+                        Name
+                        </h5>
+                    </div>
+                    <div className="p-2.5 text-center xl:p-5">
+                        <h5 className="text-sm font-medium uppercase xsm:text-base">
+                        Email
+                        </h5>
+                    </div>
+                    <div className="p-2.5 text-center xl:p-5">
+                        <h5 className="text-sm font-medium uppercase xsm:text-base">
+                        Action
+                        </h5>
+                    </div>
+                    </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map(user => (
-                        <tr key={user.id}>
-                            <td>{user.id}</td>
-                            <td>{user.name}</td>
-                            <td>
+                    {users.map((user, key) => (
+                        <div
+                            className={`grid grid-cols-3 sm:grid-cols-5 ${
+                            key === users.length - 1
+                                ? ""
+                                : "border-b border-stroke dark:border-strokedark"
+                            }`}
+                            key={key}
+                        >
+                            <div className="flex items-center gap-3 p-2.5 xl:p-5">
+                                <p className="hidden text-black dark:text-white sm:block">
+                                    {user.name}
+                                </p>
+                            </div>
+
+                            <div className="flex items-center justify-center p-2.5 xl:p-5">
+                                <p className="text-black dark:text-white">{user.email}K</p>
+                            </div>
+
+                            <div className="flex items-center justify-center p-2.5 xl:p-5">
                                 <button onClick={() => handleEdit(user.id, user.name, user.email)}>Edit</button>
                                 <button onClick={() => handleDelete(user.id)}>Delete</button>
-                            </td>
-                        </tr>
+                            </div>
+                        </div>
                     ))}
-                </tbody>
-            </table>
+                </div>
+            </div>
+            
         </div>
     );
 }

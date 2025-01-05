@@ -3,16 +3,10 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Provider } from "react-redux";
 import { store } from "@/app/store";
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import "@/css/satoshi.css";
+import "@/css/style.css";
+import Loader from "@/components/common/Loader";
+import DefaultLayout from "@/components/Layouts/DefaultLayout";
 
 export default function RootLayout({
   children,
@@ -22,12 +16,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className="dark:bg-boxdark-2 dark:text-bodydark"
         suppressHydrationWarning={true}
       >
-        <Provider store={store}>
-          {children}
-        </Provider>
+        <DefaultLayout>
+          
+          <Provider store={store}>
+            {children}
+          </Provider>
+
+        </DefaultLayout>
       </body>
     </html>
   );
