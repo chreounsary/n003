@@ -3,6 +3,7 @@ import counterReducer from './features/counter/counterSlice'
 import employeesReducer from './reduxToolkit/slice'
 import  fetchListData  from './reduxToolkit/listSlice'
 import  setFlashMessage from './reduxToolkit/messageSlice'
+import projectReducer from './reduxToolkit/project/projectSlice'
 
 
 export const store = configureStore({
@@ -11,6 +12,7 @@ export const store = configureStore({
         employees: employeesReducer,
         list: fetchListData,
         message: setFlashMessage,
+        project: projectReducer
     },
 })
 

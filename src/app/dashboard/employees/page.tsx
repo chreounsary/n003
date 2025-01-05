@@ -68,8 +68,6 @@ export default function Page() {
     <div>
       <h1>Employees</h1>
       <div>
-        {/* Filter item by name */}
-        <input type="text" placeholder="Search by name" onKeyUp={(e: any) => dispatch(fetchListData(e.target.value))}/>
         <form onSubmit={handleSubmit}>
           <label>
             Name:

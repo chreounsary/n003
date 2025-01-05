@@ -25,18 +25,6 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const name = searchParams.get('name');
-    console.log(name);
-    if (name === undefined) {
-        const employees = await prisma.employees.findMany();
-        return NextResponse.json(employees);
-    }else {
-        const employees = await prisma.employees.findMany({
-            where: {
-                name: {
-                    contains: name ? name.toString() : ""
-                }
-            }
-        });
-        return NextResponse.json(employees);
-    }
+    const employees = await prisma.employees.findMany();
+    return NextResponse.json(employees);
 }
