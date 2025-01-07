@@ -1,6 +1,7 @@
 "use client";
 import { fetchProjects, addProjectAsync } from '@/app/reduxToolkit/project/projectSlice';
 import { AppDispatch } from '@/app/store';
+import Breadcrumb from '@/components/Breadcrumbs/Breadcrumb';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // Import your organization's specific modules for API calls if available
@@ -74,35 +75,73 @@ export default function Page() {
 
   return (
     <div>
-      <div className="project">
-        <h1>New Project</h1>
-        {/* display error message set color red by using class taiwind*/}
-        {error && <div className="error">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Project Name"
-            value={projectName}
-            name='projectName'
-            onChange={(e) => setProjectName(e.target.value)}
-          />
-          {/* add item select for userID */}
-          <select name="userID" id="userID" onChange={(e) => setUserId(Number(e.target.value))}>
-            <option value="">Select User</option>
-            {users.map((user: any) => (
-              <option key={user.id} value={user.id}>{user.name}</option>
+      <div className="grid grid-cols-1 gap-9 sm:grid-cols-2 my-4">
+        <div className="flex flex-col gap-9">
+          {/* <!-- Sign Up Form --> */}
+          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div className="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
+              <h3 className="font-medium text-black dark:text-white">
+                Add User
+              </h3>
+          </div>
+          <form onSubmit={handleSubmit}>
+              <div className="p-6.5">
+                <div className="mb-4.5">
+                  <label className="mb-3 block text-sm font-medium text-black dark:text-white">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                    placeholder="Enter user name"
+                    required
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                </div>
+                {/* select option by using taiwind */}
+                <select name="userID" id="userID" onChange={(e) => setUserId(Number(e.target.value))} className='relative z-20 w-full appearance-none rounded border border-stroke bg-transparent px-12 py-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input my-4 text-white text-left'>
+                  <option value="">Select User</option>
+                  {users.map((user: any) => (
+                    <option key={user.id} value={user.id}>{user.name}</option>
+                  ))}
+                </select>
+                <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90" type="submit">Add Project</button>
+              </div>
+          </form>
+          </div>
+        </div>
+      </div>
+        
+      <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+        <div className="flex flex-col">
+          <div className="grid grid-cols-3 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
+            <div className="p-2.5 xl:p-5">
+              <h5 className="text-sm font-medium uppercase xsm:text-base">
+                Name
+              </h5>
+            </div>
+          </div>
+
+            {projects.map((project: Project, key: number) => (
+            <div
+              className={`grid grid-cols-3 sm:grid-cols-5 ${key === projects.length - 1
+                ? ""
+                : "border-b border-stroke dark:border-strokedark"
+              }`}
+              key={key}
+            >
+              <div className="flex items-center gap-3 p-2.5 xl:p-5">
+              <p className="hidden text-black dark:text-white sm:block">
+                {project.name}
+              </p>
+              </div>
+            </div>
             ))}
-          </select>
-          <button type="submit">Create</button>
-        </form>
-        <ul>
-          {projects.map((project: Project) => (
-            <li key={project.id}>
-              {project.name}
-            </li>
-          ))}
-        </ul>
+        </div>
       </div>
     </div>
+
+    
   );
 }

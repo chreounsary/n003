@@ -238,7 +238,7 @@ input[type="search"]::-webkit-search-cancel-button {
     background-size: 20px;
 }
 
-[x-cloak] {
+/* [x-cloak] {
     display: none !important;
 }
 
@@ -251,4 +251,4 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 .lg\:ml-72\.5 {
         margin-left: 15.125rem !important;
-    }
+    } */
