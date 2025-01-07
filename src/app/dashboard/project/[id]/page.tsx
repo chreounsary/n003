@@ -131,24 +131,24 @@ function Page() {
                     </ul>
                 </div>
             </div>
-
             {/* Task Detail Panel */}
-            <div
-                className={`fixed top-0 right-0 h-full bg-white shadow-lg transform transition-transform duration-300 ${
-                    showPanel ? 'translate-x-0' : 'translate-x-full'
-                } w-full md:w-4/5 lg:w-3/4 xl:w-2/3`}
-            >
-                <div className="p-6">
-                    <h3 className="text-xl font-bold mb-4">Task Details</h3>
-                    {selectedTask && <p>{selectedTask}</p>}
-                    <button
-                        onClick={closePanel}
-                        className="mt-4 px-4 py-2 bg-red-500 text-white rounded shadow hover:bg-red-600"
-                    >
-                        Close
-                    </button>
-                </div>
-            </div>
+           <div
+    className={`fixed top-0 right-0 h-full bg-white shadow-lg transform transition-transform duration-300 ${
+        showPanel ? 'translate-x-0' : 'translate-x-full'
+    } w-full md:w-4/5 lg:w-3/4 xl:w-2/3`} // Ensure h-full is used for full height
+    style={{ height: '100vh' }} // Set height to 100vh to match the main page
+>
+    <div className="p-4">
+        <h3 className="text-2xl font-bold mb-4">Task Details</h3>
+        {selectedTask && <p>{selectedTask}</p>}
+        <button
+            onClick={closePanel}
+            className="mt-4 px-4 py-2 bg-red-500 text-white rounded shadow hover:bg-red-600"
+        >
+            Close
+        </button>
+    </div>
+</div>
         </div>
     );
 }
