@@ -17,7 +17,7 @@ export default function DefaultLayout({
         </div>
         <div className="relative flex flex-1 flex-col lg:ml-54"> {/* Reduced margin */}
           <div className="flex font-size-xs">
-            <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+            {/* <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> */}
           </div>
           <main>
             <div className="mx-auto mt-3 text-xs">

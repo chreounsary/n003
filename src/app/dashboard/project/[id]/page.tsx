@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchProjectById } from '@/app/reduxToolkit/project/projectSlice';
+import { addTaskToProject, getTasksByProjectId } from '@/app/reduxToolkit/task/taskSlice';
 
 // Child component to display task details
 function TaskDetails({ task }: { task: string | null }) {
@@ -19,6 +20,8 @@ function Page() {
     const [showDialog, setShowDialog] = useState(false);
     const [selectedTask, setSelectedTask] = useState<string | null>(null);
     const project = useSelector((state: any) => state.project);
+    const tasks = useSelector((state: any) => state.task);
+
     const dispatch: any = useDispatch();
     //  const router = useRouter();
     const handleAddTaskClick = () => {
@@ -31,10 +34,10 @@ function Page() {
 
     const handleFormSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        // Logic to add the task
-        console.log('Task added:', taskName);
+        const response = dispatch(addTaskToProject({ projectId: project.projects[0].id, title: taskName, userId: project.projects[0].userId }));
+        setShowForm(!showForm);
         setTaskName('');
-        setShowForm(false);
+        return response;
     };
 
     const handleTaskClick = (task: string) => {
@@ -48,10 +51,14 @@ function Page() {
     };
     // display project by id 
     useEffect(() => {
-        const id = parseInt(window.location.pathname.split('/')[3]);
-        dispatch(fetchProjectById(id));
+        const fetchData = async () => {
+            const id = parseInt(window.location.pathname.split('/')[3]);
+            await dispatch(fetchProjectById(id));
+            await dispatch(getTasksByProjectId(id));
+        };
+        fetchData();
     }, [dispatch]);
-    
+    console.log(tasks);
     return (
         <div className="space-y-2 relative">
             {/* Project Name Header */}
@@ -88,19 +95,22 @@ function Page() {
                             </button>
                         </form>
                     )}
+
                     <ul className="space-y-2">
-                        <li className="p-2 bg-gray-50 rounded-lg border border-gray-300 shadow-sm">
-                            <div className="flex justify-between items-center">
-                                <span onClick={() => handleTaskClick('Task 1')} className="cursor-pointer text-xs">Task 1</span>
-                                <button className="text-blue-500 font-medium text-xs">Start</button>
-                            </div>
-                        </li>
-                        <li className="p-2 bg-gray-50 rounded-lg border border-gray-300 shadow-sm">
-                            <div className="flex justify-between items-center">
-                                <span onClick={() => handleTaskClick('Task 2')} className="cursor-pointer text-xs">Task 2</span>
-                                <button className="text-blue-500 font-medium text-xs">Start</button>
-                            </div>
-                        </li>
+                        {tasks?.tasks.map((task: any, index: number) => (
+                            <li key={index} className="p-2 bg-gray-50 rounded-lg border border-gray-300 shadow-sm">
+                                <div className="flex justify-between items-center">
+                                    <span onClick={() => handleTaskClick(task.title)} className="cursor-pointer text-xs">{task.title}</span>
+                                    <button className="text-blue-500 font-medium text-xs">Start</button>
+                                </div>
+                                {/* list status header here */}
+                                <div className="flex justify-between items-center">
+                                    <span className="text-xs text-red-600"> {task.status}</span>
+                                    <span className="text-xs text-red-600"> {task.priority}</span>
+                                </div>
+                               
+                            </li>
+                        ))}
                     </ul>
                 </div>
 

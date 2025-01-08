@@ -5,7 +5,7 @@ import  fetchListData  from './reduxToolkit/listSlice'
 import  setFlashMessage from './reduxToolkit/messageSlice'
 import projectReducer from './reduxToolkit/project/projectSlice'
 import userReducer from './reduxToolkit/user/userSlice'
-
+import taskReducer from './reduxToolkit/task/taskSlice'
 
 export const store = configureStore({
     reducer: {
@@ -14,7 +14,8 @@ export const store = configureStore({
         list: fetchListData,
         message: setFlashMessage,
         project: projectReducer,
-        user: userReducer
+        user: userReducer,
+        task: taskReducer
     },
 })
 
