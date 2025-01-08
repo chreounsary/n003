@@ -46,6 +46,17 @@ export const deleteProjectAsync = createAsyncThunk('project/deleteProject', asyn
   return id;
 });
 
+//fetch project by id
+
+export const fetchProjectById = createAsyncThunk('project/fetchProjectById', async (projectId: number) => {
+  const response = await fetch(`/api/projects/${projectId}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch project');
+  }
+
+  return response.json();
+});
+
 // Slice
 const projectSlice = createSlice({
   name: 'project',
@@ -80,6 +91,18 @@ const projectSlice = createSlice({
       })
       .addCase(deleteProjectAsync.fulfilled, (state, action) => {
         state.projects = state.projects.filter(project => project.id !== action.payload);
+      })
+      // fetch project by id
+      .addCase(fetchProjectById.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.projects = [action.payload];
+      })
+      .addCase(fetchProjectById.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchProjectById.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message ?? null;
       });
   },
 });

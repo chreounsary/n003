@@ -1,5 +1,7 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchProjectById } from '@/app/reduxToolkit/project/projectSlice';
 
 // Child component to display task details
 function TaskDetails({ task }: { task: string | null }) {
@@ -12,12 +14,13 @@ function TaskDetails({ task }: { task: string | null }) {
 }
 
 function Page() {
-    const projectName = "PREMARE"; // Replace with dynamic project name if needed
     const [showForm, setShowForm] = useState(false);
     const [taskName, setTaskName] = useState('');
     const [showDialog, setShowDialog] = useState(false);
     const [selectedTask, setSelectedTask] = useState<string | null>(null);
-
+    const project = useSelector((state: any) => state.project);
+    const dispatch: any = useDispatch();
+    //  const router = useRouter();
     const handleAddTaskClick = () => {
         setShowForm(!showForm);
     };
@@ -43,12 +46,17 @@ function Page() {
         setShowDialog(false);
         setSelectedTask(null);
     };
-
+    // display project by id 
+    useEffect(() => {
+        const id = parseInt(window.location.pathname.split('/')[3]);
+        dispatch(fetchProjectById(id));
+    }, [dispatch]);
+    
     return (
         <div className="space-y-2 relative">
             {/* Project Name Header */}
             <header className="text-black p-1 rounded-lg shadow-sm">
-                <h1 className="text-base font-bold">{projectName}</h1>
+                {project.projects[0] ? <p className="text-2xl font-bold">{project.projects[0].name}</p> : <p className="text-xs">No project loaded</p>}
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -144,7 +152,7 @@ function Page() {
 
             {/* Task Detail Dialog */}
             {showDialog && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-index-9999">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-8 rounded shadow-lg w-full h-full md:w-3/4 lg:w-2/3">
                         <TaskDetails task={selectedTask} />
                         <button
