@@ -2,19 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchProjectById } from '@/app/reduxToolkit/project/projectSlice';
-import { addTaskToProject, getTasksByProjectId } from '@/app/reduxToolkit/task/taskSlice';
-import { useRouter, useParams } from 'next/navigation'
-
-// Child component to display task details
-function TaskDetails({ task }: { task: string | null }) {
-    return (
-        <div>
-            <h3 className="text-base font-bold mb-4">Task Details</h3>
-            {task ? <p className="text-xs">{task}</p> : <p className="text-xs">No task selected</p>}
-        </div>
-    );
+import { addTaskToProject, getTasksByProjectId, updateTaskStatus } from '@/app/reduxToolkit/task/taskSlice';
+import { useRouter, useParams } from 'next/navigation';
+// import TaskDetails from '@/components/TaskDetails'; // Ensure this path is correct or comment it out if not used
+function getTaskDetails(task: any) {
+    const taskDetails = task;
+    return taskDetails;
 }
-
 function Page() {
     const [showForm, setShowForm] = useState(false);
     const [taskName, setTaskName] = useState('');
@@ -23,11 +17,10 @@ function Page() {
     const project = useSelector((state: any) => state.project);
     const tasks = useSelector((state: any) => state.task);
     const [error, setError] = useState<string | null>(null); 
-    const router = useRouter()
+    const router = useRouter();
     const { id } = useParams();
     const dispatch: any = useDispatch();
 
-    //  const router = useRouter();
     const handleAddTaskClick = () => {
         setShowForm(!showForm);
         setError(null); 
@@ -45,8 +38,8 @@ function Page() {
             return;
         }
         try {
-            await dispatch(addTaskToProject({ projectId: project.projects[0].id, title: taskName, userId: project.projects[0].userId  }));
-            await dispatch(getTasksByProjectId(project.projects[0].id));
+            await dispatch(addTaskToProject({ projectId: project.projects[0].id, title: taskName, userId: project.projects[0].userId }));
+            await fetchTasks(project.projects[0].id, 'TODO'); // Fetch tasks after adding
             setShowForm(!showForm);
             setTaskName('');
         } catch (error) {
@@ -59,19 +52,33 @@ function Page() {
         setShowDialog(true);
     };
 
+    const handleStartClick = (taskName: string, taskId: number, status: string) => {
+        dispatch(updateTaskStatus({ projectId: project.projects[0].id, taskId: taskId, status: status }));
+        // set refresh here
+        // or use a debounce function to delay the refresh
+        fetchTasks(project.projects[0].id, status);
+    };
+
     const closeDialog = () => {
         setShowDialog(false);
         setSelectedTask(null);
     };
 
-    // display project by id 
+    const fetchTasks = async (projectId: number, status: string) => {
+        try {
+            await dispatch(getTasksByProjectId(projectId));
+        } catch (error) {
+            console.error('Failed to fetch tasks:', error);
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             await dispatch(fetchProjectById(Number(id)));
-            await dispatch(getTasksByProjectId(Number(id)));
+            await fetchTasks(Number(id), 'TODO'); // Initial fetch for tasks with status 'TODO'
         };
         fetchData();
-    }, [dispatch]);
+    }, [dispatch, id]);
 
     return (
         <div className="space-y-2 relative">
@@ -111,19 +118,23 @@ function Page() {
                         </form>
                     )}
 
+
+                    {/* <button
+                        onClick={() => fetchTasks(Number(id), 'PENDING')}
+                        className="px-2 py-1 bg-yellow-500 text-white rounded shadow-sm hover:bg-yellow-600 text-xs"
+                    >
+                        Refresh
+                    </button> */}
                     <ul className="space-y-2">
-                        {tasks?.tasks.map((task: any, index: number) => (
-                            <li key={index} className="p-2 bg-gray-50 rounded-lg border border-gray-300 shadow-sm">
+                        {tasks?.tasks.filter((task: any) => task.status === 'PENDING').map((task: any, index: number) => (
+                            <li key={index} className="p-2 bg-yellow-50 rounded-lg border border-yellow-300 shadow-sm">
                                 <div className="flex justify-between items-center">
                                     <span onClick={() => handleTaskClick(task.title)} className="cursor-pointer text-xs">{task.title}</span>
-                                    <button className="text-blue-500 font-medium text-xs">Start</button>
+                                    <button onClick={() => handleStartClick(task.name, task.id, 'IN_PROGRESS')} className="text-blue-500 font-medium text-xs">Start</button>
                                 </div>
-                                {/* list status header here */}
                                 <div className="flex justify-between items-center">
-                                    <span className="text-xs text-red-600"> {task.status}</span>
                                     <span className="text-xs text-red-600"> {task.priority}</span>
                                 </div>
-                               
                             </li>
                         ))}
                     </ul>
@@ -132,45 +143,73 @@ function Page() {
                 {/* In Progress Section */}
                 <div className="bg-white shadow-md rounded-lg p-4">
                     <h2 className="text-sm font-semibold text-gray-800 mb-2">In Progress</h2>
+                    {/* <button
+                        onClick={() => fetchTasks(Number(id), 'IN_PROGRESS')}
+                        className="px-2 py-1 bg-yellow-500 text-white rounded shadow-sm hover:bg-yellow-600 text-xs"
+                    >
+                        Refresh
+                    </button> */}
                     <ul className="space-y-2">
-                        <li className="p-2 bg-yellow-50 rounded-lg border border-yellow-300 shadow-sm">
-                            <div className="flex justify-between items-center">
-                                <span onClick={() => handleTaskClick('Task 3')} className="cursor-pointer text-xs">Task 3</span>
-                                <button className="text-yellow-500 font-medium text-xs">Complete</button>
-                            </div>
-                        </li>
+                        {tasks?.tasks.filter((task: any) => task.status === 'IN_PROGRESS').map((task: any, index: number) => (
+                            <li key={index} className="p-2 bg-yellow-50 rounded-lg border border-yellow-300 shadow-sm">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex justify-between items-center">
+                                        <span onClick={() => handleTaskClick(task.title)} className="cursor-pointer text-xs">{task.title}</span>
+                                    </div>
+                                    <button onClick={() => handleStartClick(task.name, task.id, 'COMPLETED')}  className="text-yellow-500 font-medium text-xs">Complete</button>
+                                </div>
+
+                                <div className="flex justify-between items-center">
+                                    <span className="text-xs text-red-600"> {task.priority}</span>
+                                </div>
+                            </li>
+                        ))}
                     </ul>
                 </div>
 
                 {/* Completed Section */}
                 <div className="bg-white shadow-md rounded-lg p-4">
                     <h2 className="text-sm font-semibold text-gray-800 mb-2">Completed</h2>
+                    {/* <button
+                        onClick={() => fetchTasks(Number(id), 'COMPLETED')}
+                        className="px-2 py-1 bg-green-500 text-white rounded shadow-sm hover:bg-green-600 text-xs"
+                    >
+                        Refresh
+                    </button> */}
                     <ul className="space-y-2">
-                        <li className="p-2 bg-green-50 rounded-lg border border-green-300 shadow-sm">
-                            <div className="flex justify-between items-center">
-                                <span onClick={() => handleTaskClick('Task 4')} className="cursor-pointer text-xs">Task 4</span>
-                                <button className="text-green-500 font-medium text-xs">Reopen</button>
-                            </div>
-                        </li>
+                        {tasks?.tasks.filter((task: any) => task.status === 'COMPLETED').map((task: any, index: number) => (
+                            <li key={index} className="p-2 bg-green-50 rounded-lg border border-green-300 shadow-sm">
+                                <div className="flex justify-between items-center">
+                                    <span onClick={() => handleTaskClick(task.title)} className="cursor-pointer text-xs">{task.title}</span>
+                                    <button className="text-green-500 font-medium text-xs">Reopen</button>
+                                </div>
+
+                                <div className="flex justify-between items-center">
+                                    <span className="text-xs text-red-600"> {task.priority}</span>
+                                </div>
+                            </li>
+                        ))}
                     </ul>
                 </div>
 
                 {/* Feedback Section */}
                 <div className="bg-white shadow-md rounded-lg p-4">
                     <h2 className="text-sm font-semibold text-gray-800 mb-2">Feedback</h2>
+                    <button
+                        onClick={() => fetchTasks(Number(id), 'FEEDBACK')}
+                        className="px-2 py-1 bg-purple-500 text-white rounded shadow-sm hover:bg-purple-600 text-xs"
+                    >
+                        Refresh
+                    </button>
                     <ul className="space-y-2">
-                        <li className="p-2 bg-purple-50 rounded-lg border border-purple-300 shadow-sm">
-                            <div className="flex justify-between items-center">
-                                <span onClick={() => handleTaskClick('Feedback 1')} className="cursor-pointer text-xs">Feedback 1</span>
-                                <button className="text-purple-500 font-medium text-xs">Review</button>
-                            </div>
-                        </li>
-                        <li className="p-2 bg-purple-50 rounded-lg border border-purple-300 shadow-sm">
-                            <div className="flex justify-between items-center">
-                                <span onClick={() => handleTaskClick('Feedback 2')} className="cursor-pointer text-xs">Feedback 2</span>
-                                <button className="text-purple-500 font-medium text-xs">Review</button>
-                            </div>
-                        </li>
+                        {tasks?.tasks.filter((task: any) => task.status === 'FEEDBACK').map((task: any, index: number) => (
+                            <li key={index} className="p-2 bg-purple-50 rounded-lg border border-purple-300 shadow-sm">
+                                <div className="flex justify-between items-center">
+                                    <span onClick={() => handleTaskClick(task.title)} className="cursor-pointer text-xs">{task.title}</span>
+                                    <button className="text-purple-500 font-medium text-xs">Review</button>
+                                </div>
+                            </li>
+                        ))}
                     </ul>
                 </div>
             </div>
@@ -179,7 +218,7 @@ function Page() {
             {showDialog && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-8 rounded shadow-lg w-full h-full md:w-3/4 lg:w-2/3">
-                        <TaskDetails task={selectedTask} />
+                        {getTaskDetails(selectedTask)}
                         <button
                             onClick={closeDialog}
                             className="mt-4 px-4 py-2 bg-red-500 text-white rounded shadow-sm hover:bg-red-600 text-xs"

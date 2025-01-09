@@ -11,7 +11,7 @@ export const addTaskToProject = createAsyncThunk(
             body: JSON.stringify({ title, userId, projectId }),
         });
         return response.json();
-    }
+    },
 );
 //get all tasks by project id
 export const getTasksByProjectId = createAsyncThunk(
@@ -19,8 +19,23 @@ export const getTasksByProjectId = createAsyncThunk(
     async (projectId: number) => {
         const response = await fetch(`/api/projects/${projectId}/tasks`);
         return response.json();
+    },
+);
+//updateTaskStatus by project id and status
+export const updateTaskStatus = createAsyncThunk(
+    'task/updateTaskStatus',
+    async ({ projectId, taskId, status }: { projectId: number, taskId: number, status: string }) => {
+        const response = await fetch(`/api/projects/${projectId}/tasks/${taskId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({projectId, taskId, status}),
+        });
+        return response.json();
     }
 );
+    
 
 const taskSlice = createSlice({
     name: 'task',

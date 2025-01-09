@@ -32,8 +32,7 @@ export async function GET(req: NextRequest) {
     const id = Number(projectId);
     const tasks = await prisma.task.findMany({
         where: {
-            projectId: 2,
-            status: TaskStatus.PENDING,
+            projectId: 2
         },
     });
     return NextResponse.json(tasks);
