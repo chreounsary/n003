@@ -37,6 +37,7 @@ enum TaskStatus {
   PENDING
   IN_PROGRESS
   COMPLETED
+  FEEDBACK
 }
 
 model Task {

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchProjectById } from '@/app/reduxToolkit/project/projectSlice';
 import { addTaskToProject, getTasksByProjectId } from '@/app/reduxToolkit/task/taskSlice';
+import { useRouter, useParams } from 'next/navigation'
 
 // Child component to display task details
 function TaskDetails({ task }: { task: string | null }) {
@@ -21,23 +22,36 @@ function Page() {
     const [selectedTask, setSelectedTask] = useState<string | null>(null);
     const project = useSelector((state: any) => state.project);
     const tasks = useSelector((state: any) => state.task);
-
+    const [error, setError] = useState<string | null>(null); 
+    const router = useRouter()
+    const { id } = useParams();
     const dispatch: any = useDispatch();
+
     //  const router = useRouter();
     const handleAddTaskClick = () => {
         setShowForm(!showForm);
+        setError(null); 
     };
 
     const handleTaskNameChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setTaskName(event.target.value);
+        setError(null);
     };
 
-    const handleFormSubmit = (event: React.FormEvent) => {
+    const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        const response = dispatch(addTaskToProject({ projectId: project.projects[0].id, title: taskName, userId: project.projects[0].userId }));
-        setShowForm(!showForm);
-        setTaskName('');
-        return response;
+        if (!taskName.trim()) {
+            setError('Task name cannot be empty.');
+            return;
+        }
+        try {
+            await dispatch(addTaskToProject({ projectId: project.projects[0].id, title: taskName, userId: project.projects[0].userId  }));
+            await dispatch(getTasksByProjectId(project.projects[0].id));
+            setShowForm(!showForm);
+            setTaskName('');
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const handleTaskClick = (task: string) => {
@@ -49,16 +63,16 @@ function Page() {
         setShowDialog(false);
         setSelectedTask(null);
     };
+
     // display project by id 
     useEffect(() => {
         const fetchData = async () => {
-            const id = parseInt(window.location.pathname.split('/')[3]);
-            await dispatch(fetchProjectById(id));
-            await dispatch(getTasksByProjectId(id));
+            await dispatch(fetchProjectById(Number(id)));
+            await dispatch(getTasksByProjectId(Number(id)));
         };
         fetchData();
     }, [dispatch]);
-    console.log(tasks);
+
     return (
         <div className="space-y-2 relative">
             {/* Project Name Header */}
@@ -87,6 +101,7 @@ function Page() {
                                 className="p-1 border border-gray-300 rounded w-full mb-1 text-xs"
                                 rows={4}
                             />
+                            {error && <p className="text-red-500 text-xs mb-1">{error}</p>}
                             <button
                                 type="submit"
                                 className="px-2 py-1 bg-green-500 text-white rounded shadow-sm hover:bg-green-600 text-xs"
