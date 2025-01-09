@@ -21,6 +21,7 @@ export const getTasksByProjectId = createAsyncThunk(
         return response.json();
     },
 );
+
 //updateTaskStatus by project id and status
 export const updateTaskStatus = createAsyncThunk(
     'task/updateTaskStatus',

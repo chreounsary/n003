@@ -30,15 +30,13 @@ export async function POST(req: NextRequest) {
     }
 }
 
-// Fetching all projects for a specific user
+// Fetching all projects
 export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    // const userId = searchParams.get("userId");
-    const userId = 1;
-    const projects = await prisma.project.findMany({
-        where: {
-            userId: Number(userId),
-        },
-    });
-    return NextResponse.json(projects);
+    try {
+        const projects = await prisma.project.findMany();
+        return NextResponse.json(projects);
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({ error: "Failed to fetch projects" }, { status: 500 });
+    }
 }

@@ -11,6 +11,12 @@ export const fetchProjects = createAsyncThunk('project/fetchProjects', async (us
     return response.json();
 });
 
+// fetchAllProjects
+export const fetchAllProjects = createAsyncThunk('project/fetchAllProjects', async () => {
+  const response = await fetch('/api/projects');
+  return response.json();
+});
+
 export const addProjectAsync = createAsyncThunk('project/addProject', async ({ userId, newProject }: { userId: number, newProject: any }) => {
   const response = await fetch(`/api/projects/user/${userId}`, {
     method: 'POST',
@@ -103,6 +109,9 @@ const projectSlice = createSlice({
       .addCase(fetchProjectById.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message ?? null;
+      })
+      .addCase(fetchAllProjects.fulfilled, (state, action) => {
+        state.projects = action.payload;
       });
   },
 });
