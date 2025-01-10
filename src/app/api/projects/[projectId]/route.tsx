@@ -4,11 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 const prisma = new PrismaClient();
 export async function GET(req: NextRequest) {
     const id = req.url.split("/").pop();
-    const project = await prisma.project.findUnique({
-        where: {
-            id: Number(id),
-        },
-    });
+    const project = await prisma.project.findUnique({ where: { id:2 } });
     if (project) {
         return NextResponse.json(project);
     } else {
