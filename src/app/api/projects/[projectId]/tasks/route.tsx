@@ -1,4 +1,5 @@
 "use server";
+import { currentUser } from "@clerk/nextjs/server";
 import { PrismaClient, TaskPriority, TaskStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 const prisma = new PrismaClient();
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
                 connect: { id: body.projectId },
             },
             user: {
-                connect: { id: body.userId },
+                connect: { id: 1 },
             }
         },
     })
@@ -29,6 +30,8 @@ export async function POST(req: NextRequest) {
 //get all tasks by project id and status to-do
 export async function GET(req: NextRequest) {
     const projectId = req.url.split("/").pop();
+    const user = await currentUser();
+    console.log(user, 'Project');
     const id = Number(projectId);
     const tasks = await prisma.task.findMany({
         where: {

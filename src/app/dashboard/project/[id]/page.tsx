@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchProjectById } from '@/app/reduxToolkit/project/projectSlice';
 import { addTaskToProject, getTasksByProjectId, updateTaskStatus } from '@/app/reduxToolkit/task/taskSlice';
 import { useRouter, useParams } from 'next/navigation';
+import { currentUser } from '@clerk/nextjs/server';
 
 function getTaskDetails(task: any) {
     const taskDetails = task;
@@ -99,7 +100,7 @@ function Page() {
                     >
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-lg font-semibold text-gray-800">{section}</h2>
-                            {section === 'To-Do' && (
+                            {section === 'PENDING' && (
                                 <button
                                     onClick={handleAddTaskClick}
                                     className="px-3 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 text-sm"
@@ -108,7 +109,7 @@ function Page() {
                                 </button>
                             )}
                         </div>
-                        {showForm && section === 'To-Do' && (
+                        {showForm && section === 'PENDING' && (
                             <form onSubmit={handleFormSubmit} className="mb-4">
                                 <textarea
                                     value={taskName}
