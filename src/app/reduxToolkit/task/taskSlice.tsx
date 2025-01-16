@@ -36,7 +36,6 @@ export const updateTaskStatus = createAsyncThunk(
         return response.json();
     }
 );
-    
 
 const taskSlice = createSlice({
     name: 'task',
